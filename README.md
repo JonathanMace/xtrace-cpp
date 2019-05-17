@@ -38,9 +38,17 @@ XTrace::log("hello world! I am an X-Trace event");
 
 # X-Trace reports server
 
-This implementation sends reports to the `xtrace-server` hostname, on the default X-Trace port of 5563.  These are specified in `pubsub.h`.
+This implementation sends reports to the `xtrace-server` hostname, on the default X-Trace port of 5563.  These are specified in `pubsub.h`.  If you just want to run locally, add the line `127.0.0.1 xtrace-server` to your `/etc/hosts` file.
 
-TODO: instructions on running report server
+To download and run the X-Trace server:
+
+```
+git clone https://github.com/JonathanMace/xtrace-server
+cd xtrace-server
+xtrace-server/bin/backend
+```
+
+Traces can be viewed at http://xtrace-server:4080
 
 # Context Propagation
 
