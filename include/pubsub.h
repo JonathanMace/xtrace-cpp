@@ -14,7 +14,7 @@
 // Statically define these variables for now
 #define QUEUE_MAX_MESSAGES 1000
 #define PUBLISHER_CONNECT_RETRY_TIMEOUT_MICROS 1000000
-#define DEFAULT_SERVER_ADDRESS "localhost"
+#define DEFAULT_SERVER_ADDRESS "xtrace-server"
 #define DEFAULT_SERVER_PORT "5563"
 
 typedef std::pair<std::string, std::string> PubSubMessage;
