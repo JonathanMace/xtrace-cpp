@@ -27,7 +27,7 @@ set_target_properties(libxtrace
 	OUTPUT_NAME "xtrace"
 	PREFIX "lib"
 )
-target_link_libraries(libxtrace Threads::Threads ${Protobuf_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(libxtrace INTERFACE Threads::Threads ${Protobuf_LIBRARIES} ${Boost_LIBRARIES} )
 
 # Introduce variables:
 # * CMAKE_INSTALL_LIBDIR
@@ -47,4 +47,4 @@ install(TARGETS libxtrace DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 
 add_executable (main src/main.cc )
-target_link_libraries(main Threads::Threads ${Protobuf_LIBRARIES} ${Boost_LIBRARIES} libxtrace)
+target_link_libraries(main libxtrace)
