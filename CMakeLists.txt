@@ -49,4 +49,4 @@ install(TARGETS libxtrace DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 add_executable (main src/main.cc )
 
 target_include_directories(main PRIVATE /usr/local/include/xtrace)
-target_link_libraries(main libxtrace Threads::Threads ${Protobuf_LIBRARIES} ${Boost_LIBRARIES}  )
+target_link_libraries(main libxtrace Threads::Threads protobuf boost_system  )
