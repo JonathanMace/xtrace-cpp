@@ -67,6 +67,7 @@ namespace ThreadLocalBaggage {
 	void Delete();                       // Delete the current thread's baggage
 	void Set(Baggage new_baggage);       // Set the current thread's baggage to the provided baggage, destroying the previous baggage
 	void Join(Baggage &otherBaggage);    // Merge the current thread's baggage with the provided baggage
+	Baggage Swap (Baggage otherBaggage); // Set the current thread's baggage to the provided baggage, and return the previous baggage
 
 }
 

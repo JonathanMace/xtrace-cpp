@@ -25,6 +25,12 @@ void ThreadLocalBaggage::Set(Baggage new_baggage) {
 	current_threads_baggage = new_baggage; 
 }
 
+Baggage ThreadLocalBaggage::Swap(Baggage other_baggage) {
+	Baggage prev = current_threads_baggage;
+	current_threads_baggage = other_baggage;
+	return prev;
+}
+
 void ThreadLocalBaggage::Delete() {
 	current_threads_baggage = Baggage();	
 }
