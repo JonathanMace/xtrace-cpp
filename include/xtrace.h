@@ -37,6 +37,8 @@ void StartTrace();
 void StartTrace(std::string tag);
 void StartTrace(std::vector<std::string> tags);
 
+bool IsTracing();
+
 Logger GetLogger(std::string agent);
 
 void log(std::string message);

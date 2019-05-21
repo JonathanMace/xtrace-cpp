@@ -123,6 +123,10 @@ void XTrace::StartTrace(std::vector<std::string> tags) {
 	sendReport(report);
 }
 
+bool XTrace::IsTracing() {
+	return XTraceBaggage::HasTaskID();
+}
+
 
 XTrace::Logger XTrace::GetLogger(std::string agent) {
 	return XTrace::Logger(agent);
