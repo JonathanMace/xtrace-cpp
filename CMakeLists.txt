@@ -37,7 +37,7 @@ include(GNUInstallDirs)
 
 
 
-install(DIRECTORY "include"
+install(DIRECTORY "include/"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/xtrace"
         FILES_MATCHING
         PATTERN "*.h")
