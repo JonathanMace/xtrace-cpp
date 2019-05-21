@@ -33,7 +33,6 @@ int main(int argc, char *argv[]) {
 	XTRACE("c", {{"key1", "value1"}, {"key2", "value2"}});
 
 	Baggage branched_baggage = BRANCH_CURRENT_BAGGAGE();
-
 	std::thread branched_thread([&branched_baggage]() {
 		SET_CURRENT_BAGGAGE(branched_baggage);	
 		XTRACE("f");
@@ -41,11 +40,35 @@ int main(int argc, char *argv[]) {
 		branched_baggage = TAKE_CURRENT_BAGGAGE();
 	});
 
+
+	// Use the auto baggage macro
+	Baggage branched_baggage2 = BRANCH_CURRENT_BAGGAGE();
+	std::thread branched_thread2([&branched_baggage2]() {
+		BAGGAGE(branched_baggage2);
+
+		XTRACE("f");
+		XTRACE("g");
+	});
+
+	Baggage inline_branched_baggage = BRANCH_CURRENT_BAGGAGE();
+
+	{
+		BAGGAGE(inline_branched_baggage);
+
+		XTRACE("hello world");
+		XTRACE("goodbyte world");
+	}
+
+
 	XTRACE("d");
 	XTRACE("e");
 
 	branched_thread.join();
+	branched_thread2.join();
+	
 	JOIN_CURRENT_BAGGAGE(branched_baggage);
+	JOIN_CURRENT_BAGGAGE(branched_baggage2);	
+	JOIN_CURRENT_BAGGAGE(inline_branched_baggage);
 
 	XTRACE("h");
 

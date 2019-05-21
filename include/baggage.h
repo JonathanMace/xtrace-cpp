@@ -91,5 +91,32 @@ namespace ThreadLocalBaggage {
 
 }
 
+#define BAGGAGE(b) BaggageHelpers::AutoBaggageScopeImpl __baggage__auto_baggage_(&b, __FILE__, __LINE__)
+
+
+namespace BaggageHelpers {
+
+	// Used by AutoBaggageScope macro to scope the current block to the provided baggage
+	class AutoBaggageScopeImpl {
+	private:
+		Baggage* baggageSource;
+		Baggage suspendedBaggage;
+		const char* file;
+		int line;
+	public:
+		AutoBaggageScopeImpl(Baggage* b, const char* file, int line) : file(file), line(line) {
+			baggageSource = b;
+			suspendedBaggage = ThreadLocalBaggage::Swap(*b, file, line);
+		}
+
+		~AutoBaggageScopeImpl() {
+			*baggageSource = ThreadLocalBaggage::Swap(suspendedBaggage, file, line);
+		}
+
+	};
+
+
+}
+
 
 #endif
