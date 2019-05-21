@@ -80,7 +80,7 @@ void XTrace::Logger::log(std::string message) {
 	sendReport(report);
 }
 
-void XTrace::Logger::log(std::string message, std::string file, int line) {
+void XTrace::Logger::log(std::string file, int line, std::string message) {
 	if (!XTraceBaggage::HasTaskID()) {
 		return;
 	}
@@ -93,6 +93,28 @@ void XTrace::Logger::log(std::string message, std::string file, int line) {
 	ss << file << ":" << line;
 	std::string source = ss.str();
 	report.set_source(source);
+
+	sendReport(report);
+}
+
+void XTrace::Logger::log(std::string file, int line, std::string message, std::map<std::string, std::string> annotations) {
+	if (!XTraceBaggage::HasTaskID()) {
+		return;
+	}
+
+	XTraceReportv4 report = makeReport();
+	report.set_agent(this->agent);
+	report.set_label(message);
+
+	std::ostringstream ss;
+	ss << file << ":" << line;
+	std::string source = ss.str();
+	report.set_source(source);
+
+	for (std::map<std::string, std::string>::iterator it = annotations.begin(); it != annotations.end(); it++) {
+		report.add_key(it->first);
+		report.add_value(it->second);
+	}
 
 	sendReport(report);
 }

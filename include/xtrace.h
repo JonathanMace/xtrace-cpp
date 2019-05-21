@@ -2,21 +2,20 @@
 #ifndef _XTRACE_H_
 #define _XTRACE_H_
 
-
+#include <cstring>
 #include <string>
 #include <vector>
+#include <map>
 
 
 #define XTRACE_REPORT_PROTOBUF_TOPIC "xtpb"
 
 
-#define __XTRACE_FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define __SHORT_FILENAME__(x) (strrchr(x, '/') ? strrchr(x, '/') + 1 : x) 
 
 // Macro overloading fuckery
-#define XTRACE1(msg) XTrace::Logger(__XTRACE_FILENAME__).log(msg, __FILE__, __LINE__)
-#define XTRACE2(logger, msg) logger.log(msg, __FILE__, __LINE__)
-#define GET_XTRACE_MACRO(_1,_2,NAME,...) NAME
-#define XTRACE(...) GET_XTRACE_MACRO(__VA_ARGS__,XTRACE2,XTRACE1)(__VA_ARGS__)
+#define XTRACE2(f, l, ...) XTrace::Logger(__SHORT_FILENAME__(f)).log(f, l, __VA_ARGS__)
+#define XTRACE(...) XTRACE2(__FILE__, __LINE__, __VA_ARGS__)
 
 namespace XTrace {
 
@@ -28,7 +27,9 @@ public:
 
 	void log(std::string message);
 
-	void log(std::string message, std::string file, int line);
+	void log(std::string file, int line, std::string message);
+
+	void log(std::string file, int line, std::string message, std::map<std::string, std::string> annotations);
 };
 
 

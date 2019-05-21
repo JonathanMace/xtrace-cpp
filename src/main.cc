@@ -7,6 +7,7 @@
 #include "xtrace_baggage.h"
 #include "lexvarint.h"
 #include "baggageprotocol.h"
+#include <map>
 
 void test_vector(std::vector<int> testv) {
 	testv[0] = 5;
@@ -21,27 +22,30 @@ void printvector(std::vector<uint8_t> bytes) {
 }
 
 int main(int argc, char *argv[]) {
+	XTRACE("a");
 
 	XTrace::StartTrace("main.cc");
 
+	std::map<std::string, std::string> mymap = {{"key1", "value1"}, {"key2", "value2"}};
+
 	XTRACE("a");
 	XTRACE("b");
-	XTRACE("c");
+	XTRACE("c", {{"key1", "value1"}, {"key2", "value2"}});
 
-	Baggage branched_baggage = ThreadLocalBaggage::Branch();
+	Baggage branched_baggage = BRANCH_CURRENT_BAGGAGE();
 
 	std::thread branched_thread([&branched_baggage]() {
-		ThreadLocalBaggage::Set(branched_baggage);	
+		SET_CURRENT_BAGGAGE(branched_baggage);	
 		XTRACE("f");
 		XTRACE("g");
-		branched_baggage = ThreadLocalBaggage::Take();
+		branched_baggage = TAKE_CURRENT_BAGGAGE();
 	});
 
 	XTRACE("d");
 	XTRACE("e");
 
 	branched_thread.join();
-	ThreadLocalBaggage::Join(branched_baggage);
+	JOIN_CURRENT_BAGGAGE(branched_baggage);
 
 	XTRACE("h");
 

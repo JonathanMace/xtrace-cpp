@@ -57,10 +57,19 @@ struct Baggage {
 };
 
 
+#define GET_CURRENT_BAGGAGE() ThreadLocalBaggage::Get(__FILE__, __LINE__)
+#define TAKE_CURRENT_BAGGAGE() ThreadLocalBaggage::Take(__FILE__, __LINE__)
+#define BRANCH_CURRENT_BAGGAGE() ThreadLocalBaggage::Branch(__FILE__, __LINE__)
+#define DELETE_CURRENT_BAGGAGE() ThreadLocalBaggage::Delete(__FILE__, __LINE__)
+#define SET_CURRENT_BAGGAGE(b) ThreadLocalBaggage::Set(b, __FILE__, __LINE__)
+#define JOIN_CURRENT_BAGGAGE(b) ThreadLocalBaggage::Join(b, __FILE__, __LINE__)
+#define SWAP_CURRENT_BAGGAGE(b) ThreadLocalBaggage::Swap(b, __FILE__, __LINE__)
+
+
 // Helper methods for storing a baggage instance in thread-local storage.  Usage is optional, but very useful
 namespace ThreadLocalBaggage {
 
-	Baggage& Get();	                     // Get the current thread's baggage
+	Baggage& Get();                      // Get the current thread's baggage
 	Baggage Take();                      // Get the current thread's baggage, and clear the thread-local storage
 	Baggage Branch();                    // Get a copy of the current thread's baggage
 
@@ -68,6 +77,17 @@ namespace ThreadLocalBaggage {
 	void Set(Baggage new_baggage);       // Set the current thread's baggage to the provided baggage, destroying the previous baggage
 	void Join(Baggage &otherBaggage);    // Merge the current thread's baggage with the provided baggage
 	Baggage Swap (Baggage otherBaggage); // Set the current thread's baggage to the provided baggage, and return the previous baggage
+
+
+
+	Baggage& Get(const char* file, int line);	                   
+	Baggage Take(const char* file, int line);                      
+	Baggage Branch(const char* file, int line);                    
+
+	void Delete(const char* file, int line);                       
+	void Set(Baggage new_baggage, const char* file, int line);      
+	void Join(Baggage &otherBaggage, const char* file, int line);   
+	Baggage Swap (Baggage otherBaggage, const char* file, int line);
 
 }
 
