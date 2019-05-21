@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <vector>
+#include <string>
 
 std::vector<uint8_t> encodeVarint(uint64_t x) {
 	std::vector<uint8_t> s;
@@ -96,6 +97,16 @@ std::vector<uint8_t> Baggage::serialize() {
 		bytes.insert(bytes.end(), atoms[i].bytes.begin(), atoms[i].bytes.end());
 	}
 	return bytes;
+}
+
+std::string Baggage::str() {
+	std::vector<uint8_t> bytes = this->serialize();
+	return std::string(bytes.begin(), bytes.end());
+}
+
+Baggage Baggage::deserialize(std::string bytes) {
+	std::vector<uint8_t> bytev(bytes.begin(), bytes.end());
+	return Baggage::deserialize(bytev);
 }
 
 Baggage Baggage::deserialize(std::vector<uint8_t> bytes) {

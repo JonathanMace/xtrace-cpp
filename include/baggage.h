@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <vector>
+#include <string>
 
 
 /*
@@ -44,9 +45,11 @@ struct Baggage {
 	static Baggage merge(Baggage& a, Baggage& b);
 
 	// Serialize this baggage, as defined in the Brown Tracing Plane (length-prefix each atom in order)
+	std::string str();
 	std::vector<uint8_t> serialize();
 
 	// Deserialize a serialized baggage instance, as defined in the Brown Tracing Plane
+	static Baggage deserialize(std::string bytes);
 	static Baggage deserialize(std::vector<uint8_t> bytes);
 
 	friend std::ostream& operator<< ( std::ostream& os, const Baggage& baggage );
