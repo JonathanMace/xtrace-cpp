@@ -1,7 +1,7 @@
 #ifndef _BAGGAGE_PROTOCOL_H_
 #define _BAGGAGE_PROTOCOL_H_
 
-#include "atomlayer.h"
+#include "baggage.h"
 #include "lexvarint.h"
 
 #define ATOM_TYPE_MASK 0x80

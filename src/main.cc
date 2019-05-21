@@ -1,13 +1,12 @@
 #include <iostream>
 #include <vector>
-#include "atomlayer.h"
-#include "pubsub.h"
 #include <sstream>
+#include "baggage.h"
+#include "pubsub.h"
+#include "xtrace.h"
 #include "xtrace_baggage.h"
 #include "lexvarint.h"
 #include "baggageprotocol.h"
-#include "thread_local_baggage.h"
-#include "xtrace.h"
 
 void test_vector(std::vector<int> testv) {
 	testv[0] = 5;

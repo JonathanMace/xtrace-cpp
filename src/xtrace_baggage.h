@@ -2,7 +2,7 @@
 #define _XTRACE_BAGGAGE_H_
 
 
-#include "thread_local_baggage.h"
+#include "baggage.h"
 
 namespace XTraceBaggage {
 

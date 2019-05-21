@@ -1,5 +1,4 @@
-#include "thread_local_baggage.h"
-#include "xtrace.h"
+#include "baggage.h"
 
 
 thread_local Baggage current_threads_baggage;

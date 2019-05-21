@@ -7,7 +7,8 @@
 #include <chrono>
 #include <time.h>
 
-#include "thread_local_baggage.h"
+
+#include "baggage.h"
 #include "xtrace.h"
 #include "xtrace.pb.h"
 #include "xtrace_baggage.h"
