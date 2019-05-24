@@ -12,15 +12,17 @@ find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(Protobuf REQUIRED)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/xtrace.proto)
 
 add_library (libxtrace SHARED 
 	src/atomlayer.cpp
 	src/thread_local_baggage.cpp
 	src/pubsub.cpp
 	src/xtrace.cpp
-	src/xtrace.pb.cc
 	src/xtrace_baggage.cpp
 	src/lexvarint.cpp
+	${PROTO_SRCS}
 )
 set_target_properties(libxtrace
 	PROPERTIES

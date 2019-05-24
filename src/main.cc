@@ -22,9 +22,12 @@ void printvector(std::vector<uint8_t> bytes) {
 }
 
 int main(int argc, char *argv[]) {
+
+	std::cout << XTrace::IsTracing() << std::endl;
 	XTRACE("a");
 
 	XTrace::StartTrace("main.cc");
+	std::cout << XTrace::IsTracing() << std::endl;
 
 	std::map<std::string, std::string> mymap = {{"key1", "value1"}, {"key2", "value2"}};
 
@@ -65,7 +68,7 @@ int main(int argc, char *argv[]) {
 
 	branched_thread.join();
 	branched_thread2.join();
-	
+
 	JOIN_CURRENT_BAGGAGE(branched_baggage);
 	JOIN_CURRENT_BAGGAGE(branched_baggage2);	
 	JOIN_CURRENT_BAGGAGE(inline_branched_baggage);
