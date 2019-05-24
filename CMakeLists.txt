@@ -11,7 +11,7 @@ find_package(Threads REQUIRED)
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
-find_package(Protobuf REQUIRED)
+find_package(Protobuf 2 EXACT REQUIRED)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/xtrace.proto)
 
