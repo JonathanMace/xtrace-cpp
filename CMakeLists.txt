@@ -47,7 +47,25 @@ install(DIRECTORY "include/"
 
 install(TARGETS libxtrace DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
+# Compile the Lua library
 
+find_package(Lua51 REQUIRED)
+
+add_library(luaxtrace SHARED
+	src/luaxtrace.cpp
+	src/module.cpp
+)
+
+target_include_directories(luaxtrace PRIVATE ${LUA_INCLUDE_DIR} /usr/local/include/xtrace)
+
+set_target_properties(luaxtrace PROPERTIES PREFIX "")
+set_target_properties(luaxtrace PROPERTIES SUFFIX ".so")
+
+target_link_libraries(luaxtrace libxtrace)
+
+install(TARGETS luaxtrace DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+# Compile the main example program
 add_executable (main src/main.cc )
 
 target_include_directories(main PRIVATE /usr/local/include/xtrace)
