@@ -54,6 +54,7 @@ find_package(Lua51 REQUIRED)
 add_library(luaxtrace SHARED
 	src/luaxtrace.cpp
 	src/module.cpp
+	src/lua_baggage.cpp
 )
 
 target_include_directories(luaxtrace PRIVATE ${LUA_INCLUDE_DIR} /usr/local/include/xtrace)

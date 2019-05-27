@@ -1,4 +1,5 @@
 #include "luaxtrace.h"
+#include "lua_baggage.h"
 #include <iostream>
 
 extern "C" {
@@ -31,6 +32,10 @@ extern "C" int luaopen_luaxtrace(lua_State* L) {
     {"IsTracing", lua_xtracer::IsTracing},
     {"StartLuaTrace", lua_xtracer::StartLuaTrace},
     {"LogXTrace", lua_xtracer::LogLocal},
+    {"SetBaggage", lua_xtracer::SetBaggage},
+    {"JoinBaggage", lua_xtracer::JoinBaggage},
+    {"DeleteBaggage", lua_xtracer::DeleteBaggage},
+    {"BranchBaggage", lua_xtracer::BranchBaggage},
     {nullptr, nullptr}
   };
   std::cout << "Registering functions" << std::endl;
