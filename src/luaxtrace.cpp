@@ -18,7 +18,6 @@ void RegisterXtraceLua(lua_State* L) {
 }
 
 int StartLuaTrace(lua_State* L) {
-	std::cout << "Starting trace\n";
 	int n = lua_gettop(L);
 
 	if (n == 0) {

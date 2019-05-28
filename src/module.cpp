@@ -26,7 +26,6 @@ static void setfuncs(lua_State* L, const luaL_Reg* l, int nup) {
   *
   */
 extern "C" int luaopen_luaxtrace(lua_State* L) {
-  std::cout << "lua opening luaxtrace lib" << std::endl;
   lua_newtable(L);
   const struct luaL_Reg functions[] = {
     {"IsTracing", lua_xtracer::IsTracing},
@@ -38,7 +37,6 @@ extern "C" int luaopen_luaxtrace(lua_State* L) {
     {"BranchBaggage", lua_xtracer::BranchBaggage},
     {nullptr, nullptr}
   };
-  std::cout << "Registering functions" << std::endl;
   setfuncs(L, functions, 0);
   
   return 1;
