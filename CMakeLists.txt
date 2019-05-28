@@ -62,7 +62,7 @@ target_include_directories(luaxtrace PRIVATE ${LUA_INCLUDE_DIR} /usr/local/inclu
 set_target_properties(luaxtrace PROPERTIES PREFIX "")
 set_target_properties(luaxtrace PROPERTIES SUFFIX ".so")
 
-target_link_libraries(luaxtrace libxtrace Threads::Threads ${Protobuf_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(luaxtrace libxtrace Threads::Threads protobuf boost_system )
 
 install(TARGETS luaxtrace DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
