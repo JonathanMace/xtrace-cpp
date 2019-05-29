@@ -14,8 +14,8 @@ Baggage getBaggageFromLua(lua_State* L) {
 		std::cout << "Baggage not provided as an argument" << std::endl;
 	} else {
 		size_t len;
-		baggage_string = lua_tolstring(L, 1, &len);
-		std::cout << "Length of string is " << len << std::endl;
+		const char* baggage = lua_tolstring(L, 1, &len);
+                baggage_string.assign(baggage, baggage + len);
 	}
 
 	Baggage b = Baggage::deserialize(baggage_string);
@@ -23,7 +23,6 @@ Baggage getBaggageFromLua(lua_State* L) {
 }
 
 int SetBaggage(lua_State* L) {
-	std::cout << "Setting baggage\n";
 	Baggage b = getBaggageFromLua(L);
 	SET_CURRENT_BAGGAGE(b);
 	return 0;
