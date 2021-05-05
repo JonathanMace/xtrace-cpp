@@ -1,4 +1,4 @@
-namespace edu.brown.cs.systems.pubsub.flatbuffers;
+namespace xtraceflatbuffers;
 
 table XTraceReportCustomField {
     key:string;

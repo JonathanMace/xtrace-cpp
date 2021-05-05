@@ -15,6 +15,7 @@
 #include "baggageprotocol.h"
 #include "pubsub.h"
 #include <boost/asio/ip/host_name.hpp>
+#include "reporting_generated.h"
 
 std::random_device rd;
 std::mt19937_64 eng(rd());

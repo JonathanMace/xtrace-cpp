@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project(libxtrace)
 
-include_directories( include )
+include_directories(include /usr/local/include/flatbuffers/)
+
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 ")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 find_package(Protobuf 2 EXACT REQUIRED)
@@ -29,7 +29,7 @@ set_target_properties(libxtrace
 	OUTPUT_NAME "xtrace"
 	PREFIX "lib"
 )
-target_link_libraries(libxtrace Threads::Threads protobuf ${Boost_LIBRARIES} )
+target_link_libraries(libxtrace Threads::Threads protobuf flatbuffers ${Boost_LIBRARIES} )
 
 # Introduce variables:
 # * CMAKE_INSTALL_LIBDIR
