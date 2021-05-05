@@ -5,6 +5,7 @@
 #include "pubsub.h"
 #include "xtrace.h"
 #include "xtrace_baggage.h"
+#include <thread>
 #include "lexvarint.h"
 #include "baggageprotocol.h"
 #include <map>
@@ -30,6 +31,32 @@ void printvector(std::vector<uint8_t> bytes) {
 		std::cout << int(bytes[i]) << " ";
 	}
 	std::cout << std::endl;
+}
+
+void spamthread() {
+	int ntraces = 1000000;
+	int logpertrace = 1000;
+	uint64_t last_print = nanos();
+	uint64_t print_every = 1000000000UL;
+	uint64_t count = 0;
+	for (int i = 0; i < ntraces; i++) {
+		uint64_t now = nanos();
+		if ((now - last_print) > print_every) {
+			uint64_t tput = (count * 1000000000UL) / (now - last_print);
+			std::cout << "Done " << tput << "/s" << std::endl;
+			count = 0;
+			last_print = now;
+		}
+
+		XTrace::StartTrace("main.cc");
+		hindsight_begin(XTraceBaggage::GetTaskID());
+		for (int j = 0; j < logpertrace; j++) {
+			XTrace::log("This is an xtrace logging statement.  Hello world!");
+		}
+		hindsight_end();
+		XTraceBaggage::Clear();
+		count += logpertrace;
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -87,28 +114,14 @@ int main(int argc, char *argv[]) {
 
 	XTRACE("h");
 
-	int ntraces = 1000000;
-	int logpertrace = 1000;
-	uint64_t last_print = nanos();
-	uint64_t print_every = 1000000000UL;
-	uint64_t count = 0;
-	for (int i = 0; i < ntraces; i++) {
-		uint64_t now = nanos();
-		if ((now - last_print) > print_every) {
-			uint64_t tput = (count * 1000000000UL) / (now - last_print);
-			std::cout << "Done " << tput << "/s" << std::endl;
-			count = 0;
-			last_print = now;
-		}
+	int numthreads = 50;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < numthreads; i++) {
+		threads.push_back(std::thread(&spamthread));
+	}
 
-		XTrace::StartTrace("main.cc");
-		hindsight_begin(XTraceBaggage::GetTaskID());
-		for (int j = 0; j < logpertrace; j++) {
-			XTrace::log("This is an xtrace logging statement.  Hello world!");
-		}
-		hindsight_end();
-		XTraceBaggage::Clear();
-		count += logpertrace;
+	for (int i = 0; i < numthreads; i++) {
+		threads[i].join();
 	}
 
 	PubSub::shutdown();
