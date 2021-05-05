@@ -1,0 +1,38 @@
+namespace edu.brown.cs.systems.pubsub.flatbuffers;
+
+table XTraceReportCustomField {
+    key:string;
+    value:string;
+}
+
+// Flatbuffers specification of X-Trace report version 4; same fields as protobuf version
+table XTraceReportv4 {
+
+	// X-Trace related fields
+	task_id:long;                            // ID of the execution this report belongs to
+	event_id:long;                           // ID of this report
+	parent_event_id:[long];                  // IDs of causally-preceding reports
+	
+	// Optional tenant field
+	tenant_class:int;                        // Tenant ID
+	
+	// Timestamp fields
+    timestamp:long;                          // Epoch time in milliseconds
+    hrt:long;                                // Process-dependent high-resolution timer in nanoseconds
+    cycles:long;                             // Thread-dependent CPU cycle timer
+	
+	// Report source fields
+    process_id:int;                          // Numeric process ID
+    thread_id:int;                           // Numeric thread ID
+    host:string;                             // Hostname
+    process_name:string;                     // Process name
+    thread_name:string;                      // Thread name
+    agent:string;                            // An arbitrary string, usually a java class, where this report was generated
+    source:string;                           // The source code location where this report was generated
+ 	
+	// Message s
+    label:string;                            // String text message
+    custom_fields:[XTraceReportCustomField]; // custom fields
+    tags:[string];                           // Database tags
+
+}
