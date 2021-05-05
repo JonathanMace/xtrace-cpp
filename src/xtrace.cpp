@@ -6,11 +6,13 @@
 #include <unistd.h>
 #include <chrono>
 #include <time.h>
+extern "C" {
+	#include "hindsight.h"
+}
 
 
 #include "baggage.h"
 #include "xtrace.h"
-#include "xtrace.pb.h"
 #include "xtrace_baggage.h"
 #include "baggageprotocol.h"
 #include "pubsub.h"
@@ -33,41 +35,54 @@ uint64_t get_thread_cpu_time() {
 
 extern char *__progname;
 
+void makeReport(
+		flatbuffers::FlatBufferBuilder &builder,
+		std::string agent,
+		std::string label
+	) {
 
-XTraceReportv4 makeReport() {
-	XTraceReportv4 report;
+	// uint64_t taskId = XTraceBaggage::GetTaskID();
+	// std::vector<uint64_t> parentIds = XTraceBaggage::GetParentEventIDs();
+	// auto parents = builder.CreateVector((int64_t*) parentIds.data(), parentIds.size());
+
+	auto process_name = builder.CreateString(__progname);
+	auto host_name = builder.CreateString(boost::asio::ip::host_name());
+	auto b_agent = builder.CreateString(agent);
+	auto b_label = builder.CreateString(label);
+
+	xtraceflatbuffers::XTraceReportv4Builder b(builder);
 	{
 		using namespace std::chrono;
 		auto now = high_resolution_clock::now();
-		report.set_hrt(duration_cast<nanoseconds>(now.time_since_epoch()).count());
-		report.set_timestamp(duration_cast<milliseconds>(now.time_since_epoch()).count());
+		b.add_hrt(duration_cast<nanoseconds>(now.time_since_epoch()).count());
+		b.add_timestamp(duration_cast<milliseconds>(now.time_since_epoch()).count());
 	}
-	report.set_cycles(get_thread_cpu_time());
+	b.add_cycles(get_thread_cpu_time());
 
-	uint64_t taskId = XTraceBaggage::GetTaskID();
-	std::vector<uint64_t> parentIds = XTraceBaggage::GetParentEventIDs();
 
-	report.set_task_id(taskId);
-	for (int i = 0; i < parentIds.size(); i++) {
-		report.add_parent_event_id(parentIds[i]);
-	}
-
-	report.set_process_id(getpid());
-	report.set_process_name(__progname);
-	report.set_thread_id(std::hash<std::thread::id>{}(std::this_thread::get_id()));
-	report.set_host(boost::asio::ip::host_name());
+	// b.add_task_id(taskId);
+	// b.add_parent_event_id(parents);
+	b.add_process_id(getpid());
+	b.add_process_name(process_name);
+	b.add_thread_id(std::hash<std::thread::id>{}(std::this_thread::get_id()));
+	b.add_host(host_name);
 
 	uint64_t eventId = make_event_id();
-	report.set_event_id(eventId);
-	XTraceBaggage::SetParentEventID(eventId);
+	b.add_event_id(eventId);
+	// XTraceBaggage::SetParentEventID(eventId);
 
-	return report;
+	b.add_agent(b_agent);
+	b.add_label(b_label);
+
+	auto report = b.Finish();
+	builder.Finish(report);
 }
 
-void sendReport(XTraceReportv4 &report) {
-	std::string s;
-	report.SerializeToString(&s);
-	PubSub::publish(XTRACE_REPORT_PROTOBUF_TOPIC, s);
+void sendReport(flatbuffers::FlatBufferBuilder &builder) {
+	uint8_t *buf = builder.GetBufferPointer();
+	int size = builder.GetSize();
+	hindsight_tracepoint((char*) buf, size);
+	// std::cout << "Sending " << size << " bytes" << std::endl;
 }
 
 void XTrace::Logger::log(std::string message) {
@@ -75,10 +90,9 @@ void XTrace::Logger::log(std::string message) {
 		return;
 	}
 
-	XTraceReportv4 report = makeReport();
-	report.set_agent(this->agent);
-	report.set_label(message);
-	sendReport(report);
+	flatbuffers::FlatBufferBuilder builder(1024);
+	makeReport(builder, this->agent, message);
+	sendReport(builder);
 }
 
 void XTrace::Logger::log(std::string file, int line, std::string message) {
@@ -86,16 +100,15 @@ void XTrace::Logger::log(std::string file, int line, std::string message) {
 		return;
 	}
 
-	XTraceReportv4 report = makeReport();
-	report.set_agent(this->agent);
-	report.set_label(message);
+	flatbuffers::FlatBufferBuilder builder(1024);
+	makeReport(builder, this->agent, message);
 
-	std::ostringstream ss;
-	ss << file << ":" << line;
-	std::string source = ss.str();
-	report.set_source(source);
+	// std::ostringstream ss;
+	// ss << file << ":" << line;
+	// std::string source = ss.str();
+	// report.set_source(source);
 
-	sendReport(report);
+	sendReport(builder);
 }
 
 void XTrace::Logger::log(std::string file, int line, std::string message, std::map<std::string, std::string> annotations) {
@@ -103,30 +116,29 @@ void XTrace::Logger::log(std::string file, int line, std::string message, std::m
 		return;
 	}
 
-	XTraceReportv4 report = makeReport();
-	report.set_agent(this->agent);
-	report.set_label(message);
+	flatbuffers::FlatBufferBuilder builder(1024);
+	makeReport(builder, this->agent, message);
 
-	std::ostringstream ss;
-	ss << file << ":" << line;
-	std::string source = ss.str();
-	report.set_source(source);
+	// std::ostringstream ss;
+	// ss << file << ":" << line;
+	// std::string source = ss.str();
+	// report.set_source(source);
 
-	for (std::map<std::string, std::string>::iterator it = annotations.begin(); it != annotations.end(); it++) {
-		report.add_key(it->first);
-		report.add_value(it->second);
-	}
+	// for (std::map<std::string, std::string>::iterator it = annotations.begin(); it != annotations.end(); it++) {
+	// 	report.add_key(it->first);
+	// 	report.add_value(it->second);
+	// }
 
-	sendReport(report);
+	sendReport(builder);
 }
 
 void XTrace::StartTrace() {
 	XTraceBaggage::Clear();	// Clear old X-Trace metadata if it exists
 	XTraceBaggage::SetTaskID(make_event_id());
 
-	XTraceReportv4 report = makeReport();
-	report.set_label("Start Trace");
-	sendReport(report);
+	flatbuffers::FlatBufferBuilder builder(1024);
+	makeReport(builder, "StartTrace", "Start Trace");
+	sendReport(builder);
 }
 
 void XTrace::StartTrace(std::string tag) {
@@ -137,13 +149,12 @@ void XTrace::StartTrace(std::vector<std::string> tags) {
 	XTraceBaggage::Clear();	// Clear old X-Trace metadata if it exists
 	XTraceBaggage::SetTaskID(make_event_id());
 
-	XTraceReportv4 report = makeReport();
-	report.set_agent("StartTrace");
-	report.set_label("Start Trace");
-	for (int i = 0; i < tags.size(); i++) {
-		report.add_tags(tags[i]);
-	}
-	sendReport(report);
+	flatbuffers::FlatBufferBuilder builder(1024);
+	makeReport(builder, "StartTrace", "Start Trace");
+	// for (int i = 0; i < tags.size(); i++) {
+	// 	report.add_tags(tags[i]);
+	// }
+	sendReport(builder);
 }
 
 bool XTrace::IsTracing() {

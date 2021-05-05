@@ -9,6 +9,17 @@
 #include "baggageprotocol.h"
 #include <map>
 
+extern "C" {
+	#include "hindsight.h"
+}
+
+uint64_t nanos() {
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+    uint64_t nanos = t.tv_sec * 1000000000UL + t.tv_nsec;
+    return nanos;
+}
+
 void test_vector(std::vector<int> testv) {
 	testv[0] = 5;
 	std::cout << testv[0] << std::endl;
@@ -22,6 +33,7 @@ void printvector(std::vector<uint8_t> bytes) {
 }
 
 int main(int argc, char *argv[]) {
+	hindsight_init("XTraceExample");
 
 	std::cout << XTrace::IsTracing() << std::endl;
 	XTRACE("a");
@@ -74,6 +86,30 @@ int main(int argc, char *argv[]) {
 	JOIN_CURRENT_BAGGAGE(inline_branched_baggage);
 
 	XTRACE("h");
+
+	int ntraces = 1000000;
+	int logpertrace = 1000;
+	uint64_t last_print = nanos();
+	uint64_t print_every = 1000000000UL;
+	uint64_t count = 0;
+	for (int i = 0; i < ntraces; i++) {
+		uint64_t now = nanos();
+		if ((now - last_print) > print_every) {
+			uint64_t tput = (count * 1000000000UL) / (now - last_print);
+			std::cout << "Done " << tput << "/s" << std::endl;
+			count = 0;
+			last_print = now;
+		}
+
+		XTrace::StartTrace("main.cc");
+		hindsight_begin(XTraceBaggage::GetTaskID());
+		for (int j = 0; j < logpertrace; j++) {
+			XTrace::log("This is an xtrace logging statement.  Hello world!");
+		}
+		hindsight_end();
+		XTraceBaggage::Clear();
+		count += logpertrace;
+	}
 
 	PubSub::shutdown();
 	PubSub::join();

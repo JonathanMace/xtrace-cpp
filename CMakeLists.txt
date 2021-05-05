@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project(libxtrace)
 
-include_directories(include /usr/local/include/flatbuffers/)
+include_directories(include /usr/local/include/flatbuffers/ /usr/local/include/tracer/)
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 ")
@@ -29,7 +29,7 @@ set_target_properties(libxtrace
 	OUTPUT_NAME "xtrace"
 	PREFIX "lib"
 )
-target_link_libraries(libxtrace Threads::Threads protobuf flatbuffers ${Boost_LIBRARIES} )
+target_link_libraries(libxtrace Threads::Threads protobuf flatbuffers tracer ${Boost_LIBRARIES} )
 
 # Introduce variables:
 # * CMAKE_INSTALL_LIBDIR
@@ -57,17 +57,17 @@ add_library(luaxtrace SHARED
 	src/lua_baggage.cpp
 )
 
-target_include_directories(luaxtrace PRIVATE ${LUA_INCLUDE_DIR} /usr/local/include/xtrace)
+target_include_directories(luaxtrace PRIVATE ${LUA_INCLUDE_DIR} /usr/local/include/xtrace  /usr/local/include/tracer/)
 
 set_target_properties(luaxtrace PROPERTIES PREFIX "")
 set_target_properties(luaxtrace PROPERTIES SUFFIX ".so")
 
-target_link_libraries(luaxtrace libxtrace Threads::Threads protobuf boost_system )
+target_link_libraries(luaxtrace libxtrace Threads::Threads protobuf tracer boost_system )
 
 install(TARGETS luaxtrace DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 # Compile the main example program
 add_executable (main src/main.cc )
 
-target_include_directories(main PRIVATE /usr/local/include/xtrace)
-target_link_libraries(main libxtrace Threads::Threads protobuf boost_system  )
+target_include_directories(main PRIVATE /usr/local/include/xtrace  /usr/local/include/tracer/)
+target_link_libraries(main libxtrace Threads::Threads protobuf flatbuffers boost_system tracer  )
