@@ -29,7 +29,7 @@ set_target_properties(libxtrace
 	OUTPUT_NAME "xtrace"
 	PREFIX "lib"
 )
-target_link_libraries(libxtrace Threads::Threads ${Protobuf_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries(libxtrace Threads::Threads protobuf ${Boost_LIBRARIES} )
 
 # Introduce variables:
 # * CMAKE_INSTALL_LIBDIR
