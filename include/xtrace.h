@@ -8,7 +8,8 @@
 #include <map>
 
 
-#define XTRACE_REPORT_PROTOBUF_TOPIC "xtfb"
+#define XTRACE_REPORT_PROTOBUF_TOPIC "xtpb"
+#define XTRACE_REPORT_FLATBUF_TOPIC "xtfb"
 
 
 #define __SHORT_FILENAME__(x) (strrchr(x, '/') ? strrchr(x, '/') + 1 : x) 

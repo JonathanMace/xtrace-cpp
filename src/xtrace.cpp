@@ -79,9 +79,16 @@ void makeReport(
 }
 
 void sendReport(flatbuffers::FlatBufferBuilder &builder) {
+	// uint8_t *buf = builder.GetBufferPointer();
+	// int size = builder.GetSize();
+	// hindsight_tracepoint((char*) buf, size);
+
 	uint8_t *buf = builder.GetBufferPointer();
 	int size = builder.GetSize();
-	hindsight_tracepoint((char*) buf, size);
+	std::string s((char*) buf, size);
+	PubSub::publish(XTRACE_REPORT_FLATBUF_TOPIC, s);
+
+
 	// std::cout << "Sending " << size << " bytes" << std::endl;
 }
 
