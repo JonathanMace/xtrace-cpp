@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 
 	XTRACE("h");
 
-	int numthreads = 50;
+	int numthreads = 8;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < numthreads; i++) {
 		threads.push_back(std::thread(&spamthread));
